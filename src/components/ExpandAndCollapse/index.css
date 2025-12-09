@@ -1,16 +1,18 @@
 .react-flow .react-flow__handle {
-    width: 10px;
-    height: 10px;
+  /* display: none; */
+    opacity: 0; 
+    width: 0px;
+    height: 0px;
     border-radius: 50%;
     background-color: #784be8;
   }
   
   .react-flow .react-flow__handle-top {
-    top: -10px;
+    /* top: -10px; */
   }
   
   .react-flow .react-flow__handle-bottom {
-    bottom: -10px;
+    /* bottom: -10px; */
   }
   
   .react-flow .react-flow__node {
@@ -21,6 +23,7 @@
     display: flex;
     border-width: 2px;
     font-weight: 700;
+     overflow: visible;
   }
   
   .react-flow .react-flow__edge path,
@@ -31,5 +34,52 @@
   .wrapper {
     flex-grow: 1;
     height: 100%;
+    background-color: rgb(15, 15, 16);
   }
+
+
+.react-flow__edge.selected path {
+  stroke-dasharray: none !important;
+  stroke: inherit !important;
+}
+
+.react-flow__edge-path {
+  outline: none !important;
+}
   
+.top-nav-buttons{
+  position: absolute;
+  right: 50px;
+  top: 20px;
+  border: 1px solid rgb(40,40,45);
+
+  button{
+    background: rgb(29,29,32);
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: inherit;
+  }
+
+}
+.bottom-nav-buttons{
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translate(-50%, 0%);
+}
+
+.nav-buttons{
+  z-index: 1;
+  padding: 10px;
+  border-radius: 5px;
+  /* background: rgb(24, 24, 27); */
+}
+
+
+
+
+.react-flow__edge {
+  pointer-events: stroke; /* click only the stroke, not the label */
+}

@@ -1,0 +1,86 @@
+/* Dimmed background */
+.portal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(.01px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+ 
+
+}
+
+/* Main container */
+.portal-container {
+  background: rgb(24, 24, 27);
+  /* border-radius: 12px; */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgb(40,40,45);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  animation: popupScale 0.25s ease;
+  border-radius: 10px;
+  margin-top: 30px;
+  margin-right: 20px;
+   z-index: 10;
+}
+
+/* Slide-in for right panel */
+.portal-container.right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  /* border-radius: 0; */
+  border-left: 1px solid rgb(50, 50, 55);
+  animation: slideRight 0.25s ease-out;
+}
+
+/* Header */
+.portal-header {
+  background: rgb(29,29,32);
+  color: white;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 500;
+  border-bottom: 1px solid rgb(40,40,45);
+}
+
+/* Close button */
+.close-btn {
+  background: none;
+  color: #d4d4d8;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.close-btn:hover {
+  color: white;
+  transform: scale(1.15);
+}
+
+/* Content area */
+.portal-content {
+  padding: 16px 18px;
+  color: white;
+  overflow-y: auto;
+}
+
+/* Animations */
+@keyframes slideRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes popupScale {
+  from { transform: scale(0.93); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
