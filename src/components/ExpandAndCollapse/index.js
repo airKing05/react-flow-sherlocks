@@ -20,142 +20,65 @@ import NodeNav from '../../ui/NodeNav';
 import DemoContent from '../Portal/DemoContent';
 const elk = new ELK();
 
-/* ----------------------------------------------------------------------
-   FLAT NODES
----------------------------------------------------------------------- */
+
+
+
+
 const allNodes = [
-  { id: "vpc-1", label: "Production VPC", parent: null, isAlwaysVisible: true, hasChildren: true },
+  { id: "1",   label: "a",  parent: null, isAlwaysVisible: true, hasChildren: true },
 
-  { id: "subnet-1", label: "Public Subnet 1A", parent: "vpc-1", hasChildren: true },
-  { id: "subnet-2", label: "Private Subnet 1A", parent: "vpc-1", hasChildren: true },
-  { id: "subnet-3", label: "Public Subnet 1B", parent: "vpc-1", hasChildren: true },
-  { id: "subnet-4", label: "Private Subnet 1B", parent: "vpc-1", hasChildren: true },
-  { id: "subnet-5", label: "Database Subnet 1A", parent: "vpc-1", hasChildren: true },
-  { id: "subnet-6", label: "Database Subnet 1B", parent: "vpc-1", hasChildren: true },
+  { id: "2",   label: "b",  parent: "1", hasChildren: true },
+  { id: "3",   label: "c",  parent: "2", hasChildren: true },
+  { id: "4",   label: "d",  parent: "3", hasChildren: false },
 
-  { id: "igw-1", label: "Internet Gateway", parent: "vpc-1", hasChildren: false },
+  { id: "5",   label: "e",  parent: "1", hasChildren: true },
+  { id: "6",   label: "f",  parent: "5", hasChildren: true },
+  { id: "7",   label: "g",  parent: "6", hasChildren: false },
 
-  { id: "lb-1", label: "Application Load Balancer", parent: "subnet-1", hasChildren: true },
-  { id: "lb-2", label: "Internal Load Balancer", parent: "subnet-2", hasChildren: true },
+  { id: "8",   label: "h",  parent: "1", hasChildren: true },
+  { id: "9",   label: "i",  parent: "8", hasChildren: true },
+  { id: "10",  label: "j",  parent: "9", hasChildren: false },
+  { id: "12",  label: "k",  parent: "8", hasChildren: false },
 
-  { id: "ec2-1", label: "Web Server 1", parent: "subnet-2", hasChildren: true },
-  { id: "ec2-2", label: "Web Server 2", parent: "subnet-2", hasChildren: true },
-  { id: "ec2-3", label: "Web Server 3", parent: "subnet-4", hasChildren: true },
-  { id: "ec2-4", label: "App Server 1", parent: "subnet-2", hasChildren: false },
-  { id: "ec2-5", label: "App Server 2", parent: "subnet-4", hasChildren: false },
-  { id: "ec2-6", label: "Worker Server 1", parent: "subnet-2", hasChildren: false },
-  { id: "ec2-7", label: "Worker Server 2", parent: "subnet-4", hasChildren: false },
-  { id: "ec2-8", label: "Bastion Host", parent: "subnet-1", hasChildren: false },
+  { id: "11",  label: "l",  parent: "1", hasChildren: false },
 
-  { id: "nat-1", label: "NAT Gateway 1A", parent: "subnet-1", hasChildren: false },
-  { id: "nat-2", label: "NAT Gateway 1B", parent: "subnet-3", hasChildren: false },
+  { id: "30",  label: "30", parent: "1", isAlwaysVisible: true, hasChildren: false },
+  { id: "31",  label: "31", parent: "1", isAlwaysVisible: true, hasChildren: true },
 
-  { id: "rds-1", label: "Primary Database", parent: "subnet-5", hasChildren: true },
-  { id: "rds-2", label: "Read Replica", parent: "subnet-6", hasChildren: false },
+  { id: "311", label: "311", parent: "31", isAlwaysVisible: true, hasChildren: false },
+  { id: "312", label: "312", parent: "31", isAlwaysVisible: true, hasChildren: false },
 
-  { id: "cache-1", label: "Redis Cache", parent: "subnet-5", hasChildren: false },
-
-  { id: "s3-1", label: "Assets Bucket", parent: "ec2-1", hasChildren: true },
-  { id: "s3-2", label: "Backups Bucket", parent: "rds-1", hasChildren: false },
-  { id: "s3-3", label: "Logs Bucket", parent: "lb-1", hasChildren: false },
-
-  { id: "sqs-1", label: "Job Queue", parent: "ec2-6", hasChildren: false },
-  { id: "sns-1", label: "Alerts Topic", parent: "ec2-6", hasChildren: false },
-
-  { id: "lambda-1", label: "Image Processor", parent: "s3-1", hasChildren: true },
-
-  { id: "cloudfront-1", label: "CDN Distribution", parent: null, hasChildren: true }
-
-
-  
+  { id: "313", label: "313", parent: "31", hasChildren: false },
+  { id: "314", label: "314", parent: "31", hasChildren: false },
 ];
 
-
-
-/* ----------------------------------------------------------------------
-   FLAT EDGES
----------------------------------------------------------------------- */
 const allEdges = [
-  { id: "vpc-1-subnet-1", source: "vpc-1", target: "subnet-1", fixed: true },
-  { id: "vpc-1-subnet-2", source: "vpc-1", target: "subnet-2", fixed: true },
-  { id: "vpc-1-subnet-3", source: "vpc-1", target: "subnet-3", fixed: true },
-  { id: "vpc-1-subnet-4", source: "vpc-1", target: "subnet-4", fixed: true },
-  { id: "vpc-1-subnet-5", source: "vpc-1", target: "subnet-5", fixed: true },
-  { id: "vpc-1-subnet-6", source: "vpc-1", target: "subnet-6", fixed: true },
-  { id: "vpc-1-igw-1", source: "vpc-1", target: "igw-1" },
+  { id: "1-30", source: "1", target: "30", fixed: true },
+  { id: "1-31", source: "1", target: "31", fixed: true },
 
-  { id: "subnet-1-lb-1", source: "subnet-1", target: "lb-1" },
-  { id: "subnet-1-ec2-8", source: "subnet-1", target: "ec2-8" },
-  { id: "subnet-1-nat-1", source: "subnet-1", target: "nat-1" },
+  { id: "31-311", source: "31", target: "311", fixed: true },
+  { id: "31-312", source: "31", target: "312", fixed: true },
 
-  { id: "subnet-2-ec2-1", source: "subnet-2", target: "ec2-1" },
-  { id: "subnet-2-ec2-2", source: "subnet-2", target: "ec2-2" },
-  { id: "subnet-2-ec2-4", source: "subnet-2", target: "ec2-4" },
-  { id: "subnet-2-ec2-6", source: "subnet-2", target: "ec2-6" },
-  { id: "subnet-2-lb-2", source: "subnet-2", target: "lb-2" },
+  { id: "1-2", source: "1", target: "2" },
+  { id: "1-5", source: "1", target: "5" },
+  { id: "1-8", source: "1", target: "8" },
+  { id: "1-11", source: "1", target: "11" },
 
-  { id: "subnet-3-lb-1", source: "subnet-3", target: "lb-1" },
-  { id: "subnet-3-nat-2", source: "subnet-3", target: "nat-2" },
+  { id: "30-312", source: "30", target: "312", fixed: true },
 
-  { id: "subnet-4-ec2-3", source: "subnet-4", target: "ec2-3" },
-  { id: "subnet-4-ec2-5", source: "subnet-4", target: "ec2-5" },
-  { id: "subnet-4-ec2-7", source: "subnet-4", target: "ec2-7" },
-  { id: "subnet-4-lb-2", source: "subnet-4", target: "lb-2" },
+  { id: "2-3", source: "2", target: "3" },
+  { id: "3-4", source: "3", target: "4" },
 
-  { id: "subnet-5-rds-1", source: "subnet-5", target: "rds-1" },
-  { id: "subnet-5-cache-1", source: "subnet-5", target: "cache-1" },
+  { id: "5-6", source: "5", target: "6" },
+  { id: "6-7", source: "6", target: "7" },
 
-  { id: "subnet-6-rds-2", source: "subnet-6", target: "rds-2" },
-  { id: "subnet-6-cache-1", source: "subnet-6", target: "cache-1" },
+  { id: "8-9", source: "8", target: "9" },
+  { id: "9-10", source: "9", target: "10" },
+  { id: "8-12", source: "8", target: "12" },
 
-  { id: "lb-1-ec2-1", source: "lb-1", target: "ec2-1" },
-  { id: "lb-1-ec2-2", source: "lb-1", target: "ec2-2" },
-  { id: "lb-1-ec2-3", source: "lb-1", target: "ec2-3" },
-  { id: "lb-1-s3-3", source: "lb-1", target: "s3-3" },
-
-  { id: "lb-2-ec2-4", source: "lb-2", target: "ec2-4" },
-  { id: "lb-2-ec2-5", source: "lb-2", target: "ec2-5" },
-  { id: "lb-2-s3-3", source: "lb-2", target: "s3-3" },
-
-  { id: "ec2-1-cache-1", source: "ec2-1", target: "cache-1" },
-  { id: "ec2-1-s3-1", source: "ec2-1", target: "s3-1" },
-
-  { id: "ec2-2-cache-1", source: "ec2-2", target: "cache-1" },
-  { id: "ec2-2-s3-1", source: "ec2-2", target: "s3-1" },
-
-  { id: "ec2-3-cache-1", source: "ec2-3", target: "cache-1" },
-  { id: "ec2-3-s3-1", source: "ec2-3", target: "s3-1" },
-
-  { id: "ec2-4-rds-1", source: "ec2-4", target: "rds-1" },
-  { id: "ec2-4-cache-1", source: "ec2-4", target: "cache-1" },
-  { id: "ec2-4-sqs-1", source: "ec2-4", target: "sqs-1" },
-
-  { id: "ec2-5-rds-2", source: "ec2-5", target: "rds-2" },
-  { id: "ec2-5-cache-1", source: "ec2-5", target: "cache-1" },
-  { id: "ec2-5-sqs-1", source: "ec2-5", target: "sqs-1" },
-
-  { id: "ec2-6-rds-1", source: "ec2-6", target: "rds-1" },
-  { id: "ec2-6-s3-1", source: "ec2-6", target: "s3-1" },
-  { id: "ec2-6-sqs-1", source: "ec2-6", target: "sqs-1" },
-  { id: "ec2-6-sns-1", source: "ec2-6", target: "sns-1" },
-
-  { id: "ec2-7-rds-1", source: "ec2-7", target: "rds-1" },
-  { id: "ec2-7-s3-1", source: "ec2-7", target: "s3-1" },
-  { id: "ec2-7-sqs-1", source: "ec2-7", target: "sqs-1" },
-  { id: "ec2-7-sns-1", source: "ec2-7", target: "sns-1" },
-
-  { id: "rds-1-rds-2", source: "rds-1", target: "rds-2" },
-  { id: "rds-1-s3-2", source: "rds-1", target: "s3-2" },
-
-  { id: "s3-1-lambda-1", source: "s3-1", target: "lambda-1" },
-  { id: "lambda-1-s3-1", source: "lambda-1", target: "s3-1" },
-  { id: "lambda-1-sns-1", source: "lambda-1", target: "sns-1" },
-
-  { id: "cloudfront-1-s3-1", source: "cloudfront-1", target: "s3-1" },
-  { id: "cloudfront-1-lb-1", source: "cloudfront-1", target: "lb-1" }
-];
-
-
+  { id: "31-313", source: "31", target: "313" },
+  { id: "31-314", source: "31", target: "314" },
+]
 
 
 // isExpanded node 
@@ -177,7 +100,11 @@ async function getElkLayout(nodes, edges, toggleExpand) {
       "elk.algorithm": "layered",
       "elk.spacing.nodeNode": "20",
       "elk.layered.spacing.nodeNodeBetweenLayers": "100",
-      "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX"
+      "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+
+      // ⭐ horizontal alignment
+      "elk.alignNodes": "CENTER",
+      "elk.layered.considerModelOrder": "true"
     },
     children: nodes.map(node => ({
       id: node.id,
@@ -186,12 +113,24 @@ async function getElkLayout(nodes, edges, toggleExpand) {
     })),
     edges: edges.map(edge => ({
       id: edge.id,
-      sources: [edge.source],  // ELK needs these
+      sources: [edge.source],
       targets: [edge.target],
-      source: edge.source,      // ReactFlow needs these
+      source: edge.source,
       target: edge.target
     }))
   };
+
+  // ⭐ Force all root nodes (1, 1D, X1) into the SAME HORIZONTAL LAYER
+  const rootNodes = nodes.filter(n => n.parent === null);
+
+  elkGraph.children.forEach(child => {
+    if (rootNodes.some(r => r.id === child.id)) {
+      child.layoutOptions = {
+        "elk.layered.layerConstraint": "SAME_LAYER",
+        "elk.layered.priority": "100"
+      };
+    }
+  });
 
   const layout = await elk.layout(elkGraph);
 
@@ -200,17 +139,10 @@ async function getElkLayout(nodes, edges, toggleExpand) {
   // ------------------------------------
   const styledEdges = edges.map(edge => {
     const targetNode = nodes.find(n => n.id === edge.target);
-
     const isVisibleTarget = targetNode?.initialVisible;
 
-    const color = isVisibleTarget
-      ? "blue"                 // visible edge color
-      : "#46AE6F";   // hidden/expanded edge color
-            // solid expanded edges
-
-    const strokeDasharray = isVisibleTarget
-      ? "6 4"
-      : "0";
+    const color = isVisibleTarget ? "blue" : "#46AE6F";
+    const strokeDasharray = isVisibleTarget ? "6 4" : "0";
 
     return {
       ...edge,
@@ -218,7 +150,7 @@ async function getElkLayout(nodes, edges, toggleExpand) {
       labelStyle: {
         fill: color,
         fontWeight: "bold",
-          opacity: targetNode?.initialVisible ? 1 : 0.5
+        opacity: isVisibleTarget ? 1 : 0.5
       },
       style: {
         stroke: color,
@@ -235,9 +167,8 @@ async function getElkLayout(nodes, edges, toggleExpand) {
   });
 
   // ------------------------------------
-  // NODE STYLING (BASE STYLE ONLY)
+  // NODE STYLING
   // ------------------------------------
-  console.log("nodes-----", nodes)
   return {
     nodes: nodes.map(node => {
       const pos = layout.children.find(n => n.id === node.id);
@@ -266,10 +197,10 @@ async function getElkLayout(nodes, edges, toggleExpand) {
           parent: node.parent,
           isAlwaysVisible: node.isAlwaysVisible,
           initialVisible: node.initialVisible,
-          toggleExpand: () => toggleExpand(node.id), 
-          isGlowing: node.data?.isGlowing ?? false,  
+          toggleExpand: () => toggleExpand(node.id),
+          isGlowing: node.data?.isGlowing ?? false,
           isExpanded: computeIsExpanded(node.id, nodes),
-          hasChildren: node?.hasChildren, 
+          hasChildren: node?.hasChildren
         }
       };
     }),
@@ -277,6 +208,7 @@ async function getElkLayout(nodes, edges, toggleExpand) {
     edges: styledEdges
   };
 }
+
 
 
 /* ----------------------------------------------------------------------
