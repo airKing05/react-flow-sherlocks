@@ -18,80 +18,148 @@ import PortalPopup from '../Portal/PortalPopup';
 import CodeTour from '../Portal/CodeTour';
 import NodeNav from '../../ui/NodeNav';
 import DemoContent from '../Portal/DemoContent';
+
 const elk = new ELK();
 
+/* ---------------------------------------------------------
+      NEW DATA (REPLACES allNodes + allEdges)
+--------------------------------------------------------- */
+const defaultData = {
+  nodes: [
+    { id: "1", label: "a", parent: null, isAlwaysVisible: true, hasChildren: true },
+    { id: "30", label: "30", parent: "1", isAlwaysVisible: true, hasChildren: false },
+    { id: "31", label: "31", parent: "1", isAlwaysVisible: true, hasChildren: true },
+    { id: "311", label: "311", parent: "31", isAlwaysVisible: true, hasChildren: false },
+    { id: "312", label: "312", parent: "31", isAlwaysVisible: true, hasChildren: false }
+  ],
+  edges: [
+    { id: "1-30", source: "1", target: "30", fixed: true },
+    { id: "1-31", source: "1", target: "31", fixed: true },
+    { id: "31-311", source: "31", target: "311", fixed: true },
+    { id: "31-312", source: "31", target: "312", fixed: true },
+    { id: "30-312", source: "30", target: "312", fixed: true }
+  ]
+};
 
+const childrens = {
+  "1": {
+    nodes: [
+      { id: "2", label: "b", parent: "1", hasChildren: true },
+      { id: "5", label: "e", parent: "1", hasChildren: true },
+      { id: "8", label: "h", parent: "1", hasChildren: true },
+      { id: "11", label: "l", parent: "1", hasChildren: false }
+    ],
+    edges: [
+      { id: "1-2", source: "1", target: "2" },
+      { id: "1-5", source: "1", target: "5" },
+      { id: "1-8", source: "1", target: "8" },
+      { id: "1-11", source: "1", target: "11" }
+    ]
+  },
+  "2": {
+    nodes: [
+      { id: "3", label: "c", parent: "2", hasChildren: true }
+    ],
+    edges: [
+      { id: "2-3", source: "2", target: "3" }
+    ]
+  },
+  "3": {
+    nodes: [
+      { id: "4", label: "d", parent: "3", hasChildren: false }
+    ],
+    edges: [
+      { id: "3-4", source: "3", target: "4" }
+    ]
+  },
+  "4": { nodes: [], edges: [] },
+  "5": {
+    nodes: [{ id: "6", label: "f", parent: "5", hasChildren: true }],
+    edges: [{ id: "5-6", source: "5", target: "6" }]
+  },
+  "6": {
+    nodes: [{ id: "7", label: "g", parent: "6", hasChildren: false }],
+    edges: [{ id: "6-7", source: "6", target: "7" }]
+  },
+  "7": { nodes: [], edges: [] },
+  "8": {
+    nodes: [
+      { id: "9", label: "i", parent: "8", hasChildren: true },
+      { id: "12", label: "k", parent: "8", hasChildren: false }
+    ],
+    edges: [
+      { id: "8-9", source: "8", target: "9" },
+      { id: "8-12", source: "8", target: "12" }
+    ]
+  },
+  "9": {
+    nodes: [{ id: "10", label: "j", parent: "9", hasChildren: false }],
+    edges: [{ id: "9-10", source: "9", target: "10" }]
+  },
+  "10": { nodes: [], edges: [] },
+  "11": { nodes: [], edges: [] },
+  "30": { nodes: [], edges: [] },
+  "31": {
+    nodes: [
+      { id: "313", label: "313", parent: "31", hasChildren: false },
+      { id: "314", label: "314", parent: "31", hasChildren: false }
+    ],
+    edges: [
+      { id: "31-313", source: "31", target: "313" },
+      { id: "31-314", source: "31", target: "314" }
+    ]
+  },
+  "313": { nodes: [], edges: [] },
+  "314": { nodes: [], edges: [] },
+  "311": { nodes: [], edges: [] },
+  "312": { nodes: [], edges: [] }
+};
 
+/* ---------------------------------------------------------
+      HELPERS FOR NEW DATA STRUCTURE
+--------------------------------------------------------- */
 
-
-const allNodes = [
-  { id: "1",   label: "a",  parent: null, isAlwaysVisible: true, hasChildren: true },
-
-  { id: "2",   label: "b",  parent: "1", hasChildren: true },
-  { id: "3",   label: "c",  parent: "2", hasChildren: true },
-  { id: "4",   label: "d",  parent: "3", hasChildren: false },
-
-  { id: "5",   label: "e",  parent: "1", hasChildren: true },
-  { id: "6",   label: "f",  parent: "5", hasChildren: true },
-  { id: "7",   label: "g",  parent: "6", hasChildren: false },
-
-  { id: "8",   label: "h",  parent: "1", hasChildren: true },
-  { id: "9",   label: "i",  parent: "8", hasChildren: true },
-  { id: "10",  label: "j",  parent: "9", hasChildren: false },
-  { id: "12",  label: "k",  parent: "8", hasChildren: false },
-
-  { id: "11",  label: "l",  parent: "1", hasChildren: false },
-
-  { id: "30",  label: "30", parent: "1", isAlwaysVisible: true, hasChildren: false },
-  { id: "31",  label: "31", parent: "1", isAlwaysVisible: true, hasChildren: true },
-
-  { id: "311", label: "311", parent: "31", isAlwaysVisible: true, hasChildren: false },
-  { id: "312", label: "312", parent: "31", isAlwaysVisible: true, hasChildren: false },
-
-  { id: "313", label: "313", parent: "31", hasChildren: false },
-  { id: "314", label: "314", parent: "31", hasChildren: false },
-];
-
-const allEdges = [
-  { id: "1-30", source: "1", target: "30", fixed: true },
-  { id: "1-31", source: "1", target: "31", fixed: true },
-
-  { id: "31-311", source: "31", target: "311", fixed: true },
-  { id: "31-312", source: "31", target: "312", fixed: true },
-
-  { id: "1-2", source: "1", target: "2" },
-  { id: "1-5", source: "1", target: "5" },
-  { id: "1-8", source: "1", target: "8" },
-  { id: "1-11", source: "1", target: "11" },
-
-  { id: "30-312", source: "30", target: "312", fixed: true },
-
-  { id: "2-3", source: "2", target: "3" },
-  { id: "3-4", source: "3", target: "4" },
-
-  { id: "5-6", source: "5", target: "6" },
-  { id: "6-7", source: "6", target: "7" },
-
-  { id: "8-9", source: "8", target: "9" },
-  { id: "9-10", source: "9", target: "10" },
-  { id: "8-12", source: "8", target: "12" },
-
-  { id: "31-313", source: "31", target: "313" },
-  { id: "31-314", source: "31", target: "314" },
-]
-
-
-// isExpanded node 
-function computeIsExpanded(nodeId, currentNodes) {
-  const children = allNodes.filter(n => n.parent === nodeId);
-  const visibleChildren = currentNodes.filter(n => n.parent === nodeId);
-
-  return visibleChildren.length === children.length && children.length > 0;
+// Fetch children of node
+function getChildren(nodeId) {
+  return childrens[nodeId]?.nodes || [];
 }
 
-/* ----------------------------------------------------------------------
-   ELK LAYOUT
----------------------------------------------------------------------- */
+// Fetch children edges
+function getChildrenEdges(nodeId) {
+  return childrens[nodeId]?.edges || [];
+}
+
+// Flatten all nodes (for CodeTour)
+function getAllNodes() {
+  const out = [...defaultData.nodes];
+  Object.values(childrens).forEach(c => out.push(...c.nodes));
+  return out;
+}
+
+// Flatten all edges (for expand-all)
+function getAllEdges() {
+  const out = [...defaultData.edges];
+  Object.values(childrens).forEach(c => out.push(...c.edges));
+  return out;
+}
+
+/* ---------------------------------------------------------
+      isExpanded helper
+--------------------------------------------------------- */
+
+function computeIsExpanded(nodeId, nodes) {
+  // All currently visible children (not always visible)
+  const visible = nodes.filter(
+    n => n.data?.parent === nodeId && !n.data?.isAlwaysVisible
+  );
+
+  // If ANY visible children exist → expanded
+  return visible.length > 0;
+}
+
+/* ---------------------------------------------------------
+      ELK LAYOUT - unchanged
+--------------------------------------------------------- */
 async function getElkLayout(nodes, edges, toggleExpand) {
   const elkGraph = {
     id: "root",
@@ -101,8 +169,6 @@ async function getElkLayout(nodes, edges, toggleExpand) {
       "elk.spacing.nodeNode": "20",
       "elk.layered.spacing.nodeNodeBetweenLayers": "100",
       "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
-
-      // ⭐ horizontal alignment
       "elk.alignNodes": "CENTER",
       "elk.layered.considerModelOrder": "true"
     },
@@ -120,9 +186,7 @@ async function getElkLayout(nodes, edges, toggleExpand) {
     }))
   };
 
-  // ⭐ Force all root nodes (1, 1D, X1) into the SAME HORIZONTAL LAYER
   const rootNodes = nodes.filter(n => n.parent === null);
-
   elkGraph.children.forEach(child => {
     if (rootNodes.some(r => r.id === child.id)) {
       child.layoutOptions = {
@@ -134,92 +198,99 @@ async function getElkLayout(nodes, edges, toggleExpand) {
 
   const layout = await elk.layout(elkGraph);
 
-  // ------------------------------------
-  // EDGE STYLING
-  // ------------------------------------
+  /* ----------------------------------------
+     STYLE EDGES
+  ---------------------------------------- */
   const styledEdges = edges.map(edge => {
     const targetNode = nodes.find(n => n.id === edge.target);
     const isVisibleTarget = targetNode?.initialVisible;
-
     const color = isVisibleTarget ? "blue" : "#46AE6F";
-    const strokeDasharray = isVisibleTarget ? "6 4" : "0";
 
     return {
       ...edge,
-      label: `${edge.source} → ${edge.target}`,
-      labelStyle: {
-        fill: color,
-        fontWeight: "bold",
-        opacity: isVisibleTarget ? 1 : 0.5
-      },
       style: {
         stroke: color,
         strokeWidth: 3,
-        strokeDasharray
+        strokeDasharray: isVisibleTarget ? "6 4" : "0"
       },
       markerEnd: {
         type: MarkerType.ArrowClosed,
         width: 12,
         height: 12,
         color
+      },
+      label: edge.label ?? `${edge.source} → ${edge.target}`,
+      labelStyle: {
+        fill: color,
+        fontWeight: "bold",
+        fontSize: 12,
+        opacity: isVisibleTarget ? 1 : 0.5
+      },
+    };
+  });
+
+  /* ----------------------------------------
+     FIRST PASS — layout, style, NO isExpanded
+  ---------------------------------------- */
+  const layoutedNodes = nodes.map(node => {
+    const pos = layout.children.find(n => n.id === node.id);
+
+    const bgColor = node.initialVisible
+      ? "linear-gradient(to left, #283593, #3949AB)"
+      : "linear-gradient(to right bottom, #F59E0B, #D97706)";
+
+    return {
+      ...node,
+      type: "custom",
+      position: { x: pos.x, y: pos.y },
+
+      style: {
+        color: "white",
+        background: bgColor,
+        border: node.initialVisible
+          ? "2px solid #5C6BC0"
+          : "2px solid #FBBF24",
+        borderRadius: 8
+      },
+
+      data: {
+        ...node.data,
+        label: node.label,
+        parent: node.parent,          // <-- preserve parent
+        isAlwaysVisible: node.isAlwaysVisible,
+        initialVisible: node.initialVisible,
+        toggleExpand: () => toggleExpand(node.id),
+        isGlowing: node.data?.isGlowing ?? false,
+        hasChildren: node.hasChildren
+        // 🚫 no isExpanded yet
       }
     };
   });
 
-  // ------------------------------------
-  // NODE STYLING
-  // ------------------------------------
+  /* ----------------------------------------
+     SECOND PASS — NOW compute isExpanded  
+     (using layoutedNodes = current graph)
+  ---------------------------------------- */
+  layoutedNodes.forEach(n => {
+    n.data.isExpanded = computeIsExpanded(n.id, layoutedNodes);
+  });
+
   return {
-    nodes: nodes.map(node => {
-      const pos = layout.children.find(n => n.id === node.id);
-
-      const bgColor = node.initialVisible
-        ? "linear-gradient(to left, #283593, #3949AB)"
-        : "linear-gradient(to right bottom, #F59E0B, #D97706)";
-
-      return {
-        ...node,
-        type: "custom",
-        position: { x: pos.x, y: pos.y },
-
-        style: {
-          color: "white",
-          background: bgColor,
-          border: node.initialVisible
-            ? "2px solid #5C6BC0"
-            : "2px solid #FBBF24",
-          borderRadius: 8
-        },
-
-        data: {
-          ...node.data,
-          label: node.label,
-          parent: node.parent,
-          isAlwaysVisible: node.isAlwaysVisible,
-          initialVisible: node.initialVisible,
-          toggleExpand: () => toggleExpand(node.id),
-          isGlowing: node.data?.isGlowing ?? false,
-          isExpanded: computeIsExpanded(node.id, nodes),
-          hasChildren: node?.hasChildren
-        }
-      };
-    }),
-
+    nodes: layoutedNodes,
     edges: styledEdges
   };
 }
 
 
-
-/* ----------------------------------------------------------------------
-   MAIN COMPONENT
----------------------------------------------------------------------- */
+/* ---------------------------------------------------------
+      MAIN COMPONENT
+--------------------------------------------------------- */
 const edgeTypes = { smoothstep: SmoothStepEdge };
 const nodeTypes = { custom: CustomNode };
 
 const ExpandAndCollapse = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes] = useNodesState([]);
+  const [edges, setEdges] = useEdgesState([]);
 
   const [isCodeTourePopupOpen, setCodeTourePopupOpen] = useState(false);
 
@@ -231,498 +302,381 @@ const ExpandAndCollapse = () => {
   const [openRight, setOpenRight] = useState(false);
   const [visited, setVisited] = useState(new Set());
 
-
   const rf = useReactFlow();
 
-
   async function waitForReactFlowToStabilize() {
-  // ReactFlow needs TWO frames after setNodes()
-  await new Promise(r => requestAnimationFrame(r));
-  await new Promise(r => requestAnimationFrame(r));
-}
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => requestAnimationFrame(r));
+  }
 
-  /* -------------------------------------------
-    SAME LOGIC AS BEFORE — DO NOT CHANGE
-  -------------------------------------------- */
-const handleNodeClick = useCallback(
-  async (_, node) => {
+  /* ---------------------------------------------------------
+      UPDATED CLICK HANDLER (NEW DATA LOGIC)
+  --------------------------------------------------------- */
+  const handleNodeClick = useCallback(
+    async (_, node) => {
+      const nodeId = node.id;
 
-    const nodeId = node.id;
+      const currentNodes = rf.getNodes();
+      const currentEdges = rf.getEdges();
 
-    // ⭐ Always use ReactFlow internal state
-    const currentNodes = rf.getNodes();
-    const currentEdges = rf.getEdges();
+      const allChildren = getChildren(nodeId);
+      const visibleChildren = currentNodes.filter(
+        n => n.data.parent === nodeId && !n.data.isAlwaysVisible
+      );
 
-    // -----------------------------------------
-    // FIND CHILDREN
-    // -----------------------------------------
-    const visibleChildren = currentNodes.filter(n => n.data.parent === nodeId);
-    const allChildren = allNodes.filter(n => n.parent === nodeId);
+      console.log("nodeId=====", nodeId, allChildren, visibleChildren);
 
-    console.log("nodeId:", nodeId, currentNodes, visibleChildren, allChildren);
+      // ------------------ EXPAND ------------------
+      if (visibleChildren.length !== allChildren.length) {
+        // Always add ALL children (remove broken skip logic)
+        const newChildren = allChildren.map(child => ({
+          ...child,
+          initialVisible: false
+        }));
 
-    // ============================================================
-    // EXPAND
-    // ============================================================
-    if (visibleChildren.length !== allChildren.length) {
+        const newNodes = [
+          ...currentNodes,
+          ...newChildren.filter(
+            c => !currentNodes.some(n => n.id === c.id)
+          )
+        ];
 
-      // Missing children
-      const missing = allChildren
-        .filter(c => !currentNodes.find(n => n.id === c.id))
-        .map(c => ({ ...c, initialVisible: false }));
+        const newEdges = [
+          ...currentEdges,
+          ...getChildrenEdges(nodeId)
+        ];
 
-      // New nodes = old + missing ones
-      const newNodes = [...currentNodes, ...missing];
+        const { nodes: layouted, edges: styledEdges } =
+          await getElkLayout(newNodes, newEdges, toggleExpand);
 
-      // New edges = old + edges pointing to newly added nodes
-      const newEdges = [
-        ...currentEdges,
-        ...allEdges.filter(edge =>
-          missing.find(m => m.id === edge.target)
-        )
-      ];
-
-      // Run ELK layout
-      const { nodes: layouted, edges: styledEdges } =
-        await getElkLayout(newNodes, newEdges, toggleExpand);
-
-      setNodes(layouted);
-      setEdges(styledEdges);
-
-      // Center clicked node after layout
-      // ⭐ WAIT for ReactFlow to render new nodes + measure them
-      await waitForReactFlowToStabilize();
-
-      // Now get the actual rendered node with correct x/y
-      const updatedNode = rf.getNode(nodeId);
-
-      if (updatedNode) {
-        rf.setCenter(
-          updatedNode.position.x + (updatedNode.width || 200) / 2,
-          updatedNode.position.y + (updatedNode.height || 60) / 2,
-          {
-            zoom: 1.2,
-            duration: 500
-          }
-        );
+        setNodes(layouted);
+        setEdges(styledEdges);
+        return;
       }
 
+      console.log("nodeId===== 2222222", nodeId, allChildren, visibleChildren);
 
-      return;
-    }
-
-    // ============================================================
-    // COLLAPSE
-    // ============================================================
-    const filteredNodes = currentNodes.filter(
-      n => n.parent !== nodeId || n.data.isAlwaysVisible
-    );
-
-    const filteredEdges = currentEdges.filter(
-      e => e.fixed || e.source !== nodeId
-    );
-
-    const { nodes: layouted2, edges: styledEdges2 } =
-      await getElkLayout(filteredNodes, filteredEdges, toggleExpand);
-
-    setNodes(layouted2);
-    setEdges(styledEdges2);
-
-    // Center node after collapse
-    // ⭐ WAIT for ReactFlow to render new nodes + measure them
-    await waitForReactFlowToStabilize();
-
-    // Now get the actual rendered node with correct x/y
-    const updatedNode = rf.getNode(nodeId);
-
-    if (updatedNode) {
-      rf.setCenter(
-        updatedNode.position.x + (updatedNode.width || 200) / 2,
-        updatedNode.position.y + (updatedNode.height || 60) / 2,
-        {
-          zoom: 1.2,
-          duration: 500
-        }
+      // ------------------ COLLAPSE ------------------
+      const filteredNodes = currentNodes.filter(
+        n => n.data.parent !== nodeId || n.data.isAlwaysVisible  // <-- FIXED
       );
-    }
+
+      const filteredEdges = currentEdges.filter(
+        e => e.fixed || e.source !== nodeId
+      );
+
+      const { nodes: layouted2, edges: styledEdges2 } =
+        await getElkLayout(filteredNodes, filteredEdges, toggleExpand);
+
+      setNodes(layouted2);
+      setEdges(styledEdges2);
+    },
+    [rf]
+  );
 
 
+  /* ---------------------------------------------------------
+      toggleExpand function
+  --------------------------------------------------------- */
+  const toggleExpand = useCallback(
+    nodeId => {
+      const n = rf.getNode(nodeId);
+    
+      if (n) handleNodeClick(null, n);
+    },
+    [rf, handleNodeClick]
+  );
 
-  },
-
-  // dependencies
-  [rf, allNodes, allEdges, getElkLayout]
-);
-
-  /* -------------------------------------------
-    NEW FUNCTION → used by CustomNode +/-
-  -------------------------------------------- */
- const toggleExpand = useCallback(
-  (nodeId) => {
-    // const node = nodes.find(n => n.id === nodeId);
-    const node = rf.getNode(nodeId); 
-    console.log("node---",nodeId, node, nodes)
-    if (!node) return;
-    handleNodeClick(null, node);
-  },
-  [rf, handleNodeClick]
-);
-
-  /* -------------------------------------------
-    INITIAL VISIBLES
-  -------------------------------------------- */
+  /* ---------------------------------------------------------
+      INITIAL LOAD — UPDATED
+  --------------------------------------------------------- */
   useEffect(() => {
-    const initialVisible = allNodes
-      .filter(n => n.parent === null || n.isAlwaysVisible)
-      .map(n => ({ ...n, initialVisible: true }));
+    const initialVisible = defaultData.nodes.map(n => ({
+      ...n,
+      initialVisible: true
+    }));
 
-    const initialEdges = allEdges.filter(
-      e =>
-        initialVisible.find(n => n.id === e.source) &&
-        initialVisible.find(n => n.id === e.target)
-    );
+    const initialEdges = defaultData.edges;
 
     (async () => {
-      const { nodes: layouted, edges: styledEdges } = await getElkLayout(
-        initialVisible,
-        initialEdges,
-        toggleExpand
-      );
-
-       console.log("styledEdges---+++", styledEdges)
-
+      const { nodes: layouted, edges: styledEdges } =
+        await getElkLayout(initialVisible, initialEdges, toggleExpand);
 
       setNodes(layouted);
       setEdges(styledEdges);
     })();
   }, []);
 
-
-  /* -------------------------------------------
-    all the nodes will be visible 
-  -------------------------------------------- */
-const handleExpandAll = async () => {
-  // 1) Make all nodes visible, with correct child coloring
-  const expandedNodes = allNodes.map(n => ({
-    ...n,
-    initialVisible: n.parent === null || n.isAlwaysVisible ? true : false
-  }));
-
-  // 2) All raw edges
-  const expandedEdges = [...allEdges];
-
-  // 3) Run layout (returns styledEdges but we DO NOT USE them)
-  const { nodes: layoutedNodes, edges: styledEdges } =
-    await getElkLayout(expandedNodes, expandedEdges, toggleExpand);
-
-  // 4) Update ReactFlow in the SAME WAY as manual expand
-  setNodes(layoutedNodes);
-  setEdges(styledEdges);  // ← IMPORTANT FIX
-
-  // ⭐ Fit view AFTER render
-  setTimeout(() => {
-    rf.fitView({ padding: 0.3, duration: 600 });
-  }, 50);
-};
-
- /* -------------------------------------------
-    children will be hided
-  -------------------------------------------- */
-const handleCollapseAll = async () => {
-  // 1) Only keep root nodes and always-visible nodes
-  const collapsedNodes = allNodes
-    .filter(n => n.parent === null || n.isAlwaysVisible)
-    .map(n => ({
+  /* ---------------------------------------------------------
+      Expand All — UPDATED
+  --------------------------------------------------------- */
+  const handleExpandAll = async () => {
+    const expandedNodes = getAllNodes().map(n => ({
       ...n,
-      initialVisible: true   // visible nodes keep visible color
+      initialVisible: n.parent === null || n.isAlwaysVisible ? true : false
     }));
 
-  // 2) Only keep edges connecting visible nodes
-  const collapsedEdges = allEdges.filter(e =>
-    collapsedNodes.find(n => n.id === e.source) &&
-    collapsedNodes.find(n => n.id === e.target)
+    const expandedEdges = getAllEdges();
+
+    const { nodes: layoutedNodes, edges: styledEdges } =
+      await getElkLayout(expandedNodes, expandedEdges, toggleExpand);
+
+    setNodes(layoutedNodes);
+    setEdges(styledEdges);
+
+    setTimeout(() => {
+      rf.fitView({ padding: 0.3, duration: 600 });
+    }, 50);
+  };
+
+  /* ---------------------------------------------------------
+      Collapse All — UPDATED
+  --------------------------------------------------------- */
+  const handleCollapseAll = async () => {
+    const collapsedNodes = defaultData.nodes.map(n => ({
+      ...n,
+      initialVisible: true
+    }));
+
+    const collapsedEdges = defaultData.edges;
+
+    const { nodes: layoutedNodes, edges: styledEdges } =
+      await getElkLayout(collapsedNodes, collapsedEdges, toggleExpand);
+
+    setNodes(layoutedNodes);
+    setEdges(styledEdges);
+
+    setTimeout(() => {
+      rf.fitView({ padding: 0.3, duration: 600 });
+    }, 50);
+  };
+
+  /* ---------------------------------------------------------
+      Edge click highlight
+  --------------------------------------------------------- */
+  const focusNode = useCallback(
+    nodeId => {
+      const node = rf.getNode(nodeId);
+      if (!node) return;
+
+      setSelectedNode(node);
+
+      rf.setCenter(
+        node.position.x + (node.width || 200) / 2,
+        node.position.y + (node.height || 60) / 2,
+        { zoom: 1.8, duration: 800, easing: "easeInOutCubic" }
+      );
+    },
+    [rf]
   );
 
-  // 3) Re-run layout
-  const { nodes: layoutedNodes, edges: styledEdges } =
-    await getElkLayout(collapsedNodes, collapsedEdges, toggleExpand);
+  const handleEdgeClick = useCallback(
+    (event, edge) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-  // 4) Update state
-  setNodes(layoutedNodes);
-  setEdges(styledEdges);
+      const nodeId = edge.target;
 
-  // ⭐ Fit view AFTER render
-   setTimeout(() => {
-    rf.fitView({ padding: 0.3, duration: 600 });
-  }, 50);
-};
+      setNodes(ns =>
+        ns.map(n =>
+          n.id === nodeId
+            ? { ...n, data: { ...n.data, isGlowing: true } }
+            : n
+        )
+      );
 
- /* -------------------------------------------
-    Box shadow/ glow to selected node by edge click
-  -------------------------------------------- */
-const focusNode = useCallback(
-  (nodeId) => {
-    const node = rf.getNode(nodeId);
-    if (!node) return;
+      setTimeout(() => {
+        setNodes(ns =>
+          ns.map(n =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, isGlowing: false } }
+              : n
+          )
+        );
+      }, 1000);
 
-    setSelectedNode(node);
-    rf.setCenter(
-      node.position.x + (node.width || 200) / 2,
-      node.position.y + (node.height || 60) / 2,
-      {
-        zoom: 1.8,
-        duration: 800,
-        easing: 'easeInOutCubic'
-      }
-    );
-  },
-  [rf]
-);
-
-const handleEdgeClick = useCallback((event, edge) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  const nodeId = edge.target;
-
-  // Turn glow ON for target node
-  setNodes(ns =>
-    ns.map(n =>
-      n.id === nodeId
-        ? { ...n, data: { ...n.data, isGlowing: true } }
-        : n
-    )
+      focusNode(nodeId);
+    },
+    [focusNode]
   );
 
-  // Turn glow OFF after 1 second
-  setTimeout(() => {
-    setNodes(ns =>
-      ns.map(n =>
-        n.id === nodeId
-          ? { ...n, data: { ...n.data, isGlowing: false } }
-          : n
-      )
-    );
-  }, 1000);
-
-  focusNode(nodeId);
-}, [focusNode]);
-
- /* -------------------------------------------
-   Code tour
-  -------------------------------------------- */
-
+  /* ---------------------------------------------------------
+      Code Tour (uses updated data)
+  --------------------------------------------------------- */
 function buildTourPath(allNodes, rootId) {
-  const map = {};
+  // group nodes by parent
+  const childrenMap = {};
+
   allNodes.forEach(n => {
-    if (!map[n.parent]) map[n.parent] = [];
-    map[n.parent].push(n.id);
+    if (!childrenMap[n.parent]) childrenMap[n.parent] = [];
+    childrenMap[n.parent].push(n.id);
   });
+
+  // ensure stable ordering (optional)
+  Object.values(childrenMap).forEach(list => list.sort());
 
   const path = [];
 
-  // DFS-like traversal but special rule: alwaysVisible nodes included early
-  function walk(id) {
-    path.push(id);
+  function dfs(nodeId) {
+    path.push(nodeId);                 // visit this node
 
-    const children = map[id] || [];
-    children.forEach(child => walk(child));
+    const childList = childrenMap[nodeId] || [];
+
+    childList.forEach(childId => {
+      dfs(childId);                    // visit children before siblings
+    });
   }
 
-  walk(rootId);
+  // handle all top-level roots in order
+  const rootLevel = childrenMap[null] || [];
 
-  // AFTER root subtree, append top-level alwaysVisible nodes:
-  const topAlways = allNodes
-    .filter(n => n.parent === null && n.isAlwaysVisible && n.id !== rootId);
-
-  topAlways.forEach(n => walk(n.id));
+  rootLevel.forEach(topNode => {
+    dfs(topNode);
+  });
 
   return path;
 }
 
-async function goToNodeInTour(nodeId) {
-  // expand/collapse first
-  await toggleExpand(nodeId);
+  async function goToNodeInTour(nodeId) {
+    await toggleExpand(nodeId);
+    await new Promise(res => setTimeout(res, 30));
 
-  // wait for ELK layout to finish
-  await new Promise(res => setTimeout(res, 30));
-
-  // 🟦 mark this node as visited
-  // setVisited(v => new Set([...v, nodeId]));
-
-  // -----------------------------
-  // UPDATE NODES
-  // -----------------------------
-  setNodes(ns =>
-    ns.map(n => {
-      const isCurrent = n.id === nodeId;
-      const isVisited = visited.has(n.id) || isCurrent;
-
-      return {
-        ...n,
-        data: {
-          ...n.data,
-          isGlowing: isCurrent
-        },
-        style: {
-          ...n.style,
-          opacity: isCurrent ? 1 : isVisited ? 1 : 0.2,
-          border: isCurrent
-            ? "3px solid gold"
-            : n.style.border
-        }
-      };
-    })
-  );
-
-  // -----------------------------
-  // UPDATE EDGES
-  // -----------------------------
-  setEdges(es =>
-    es.map(e => {
-      const isCurrentEdge =
-        e.source === nodeId || e.target === nodeId;
-
-      const isVisitedEdge =
-        visited.has(e.source) && visited.has(e.target);
-
-      return {
-        ...e,
-        style: {
-          ...e.style,
-          opacity: isCurrentEdge ? 1 : isVisitedEdge ? 1 : 0.2
-        }
-      };
-    })
-  );
-
-  // glow off for current node after 1 second
-  setTimeout(() => {
     setNodes(ns =>
-      ns.map(n =>
-        n.id === nodeId
-          ? { ...n, data: { ...n.data, isGlowing: false } }
-          : n
-      )
+      ns.map(n => {
+        const isCurrent = n.id === nodeId;
+        const isVisited = visited.has(n.id) || isCurrent;
+        
+        const border = isCurrent ? (n.isAlwaysVisible ? "3px solid #5C6BC0" : "3px solid #FBBF24") : n.style.border
+
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            isGlowing: isCurrent
+          },
+          style: {
+            ...n.style,
+            opacity: isCurrent ? 1 : isVisited ? 1 : 0.2,
+            border: border
+          }
+        };
+      })
     );
-  }, 1000);
 
-  // center current node
-  const node = rf.getNode(nodeId);
-  if (node) {
-    rf.setCenter(
-      node.position.x + 100,
-      node.position.y + 30,
-      { zoom: 1.4, duration: 600 }
+    setEdges(es =>
+      es.map(e => {
+        const isCurrentEdge = e.source === nodeId || e.target === nodeId;
+        const isVisitedEdge =
+          visited.has(e.source) && visited.has(e.target);
+
+        return {
+          ...e,
+          style: {
+            ...e.style,
+            opacity: isCurrentEdge ? 1 : isVisitedEdge ? 1 : 0.2
+          }
+        };
+      })
     );
 
-    setSelectedNode(node);
+    setTimeout(() => {
+      setNodes(ns =>
+        ns.map(n =>
+          n.id === nodeId
+            ? { ...n, data: { ...n.data, isGlowing: false } }
+            : n
+        )
+      );
+    }, 1000);
 
+    const node = rf.getNode(nodeId);
+    if (node) {
+      rf.setCenter(
+        node.position.x + 100,
+        node.position.y + 30,
+        { zoom: 1.4, duration: 600 }
+      );
+      setSelectedNode(node);
+    }
   }
 
-}
+  const startTour = async () => {
+    const all = getAllNodes();
+    const root = all.find(n => n.parent === null)?.id;
+    const path = buildTourPath(all, root);
 
+    setTourPath(path);
+    setTourIndex(0);
+    setIsTourActive(true);
 
-const startTour = async () => {
-  const root = allNodes.find(n => n.parent === null)?.id;
-  const path = buildTourPath(allNodes, root);
+    setVisited(new Set([path[0]]));
 
-  setTourPath(path);
-  setTourIndex(0);
-  setIsTourActive(true);
+    setNodes(ns => ns.map(n => ({ ...n, style: { ...n.style, opacity: 0.2 } })));
+    setEdges(es => es.map(e => ({ ...e, style: { ...e.style, opacity: 0.2 } })));
 
-  // mark first node as visited right now (IMPORTANT!)
-  setVisited(new Set([path[0]]));
+    await goToNodeInTour(path[0]);
+  };
 
-  // dim everything
-  setNodes(ns => ns.map(n => ({ ...n, style: { ...n.style, opacity: 0.2 } })));
-  setEdges(es => es.map(e => ({ ...e, style: { ...e.style, opacity: 0.2 } })));
-
-  // go to first node
-  await goToNodeInTour(path[0]);
-};
-
-const nextTourStep = () => {
-  setTourIndex(i => {
-    if (i + 1 >= tourPath.length) return i;
-
-    const newIndex = i + 1;
-    const nodeId = tourPath[newIndex];
-
-    setVisited(v => new Set([...v, nodeId]));
-
-    // wait for visited to update
-    setTimeout(() => goToNodeInTour(nodeId), 0);
-
-    return newIndex;
-  });
-
-  setOpenRight(true);
-};
-
-
-const prevTourStep = () => {
-  setTourIndex(i => {
-    if (i - 1 < 0) return i;
-
-    const newIndex = i - 1;
-    const nodeId = tourPath[newIndex];
-
-    setVisited(v => {
-      const arr = Array.from(v);
-      arr.pop();     // remove last visited node
-      return new Set(arr);
+  const nextTourStep = () => {
+    setTourIndex(i => {
+      if (i + 1 >= tourPath.length) return i;
+      const newIndex = i + 1;
+      const nodeId = tourPath[newIndex];
+      setVisited(v => new Set([...v, nodeId]));
+      setTimeout(() => goToNodeInTour(nodeId), 0);
+      return newIndex;
     });
+    setOpenRight(true);
+  };
 
-    setTimeout(() => goToNodeInTour(nodeId), 0);
+  const prevTourStep = () => {
+    setTourIndex(i => {
+      if (i - 1 < 0) return i;
+      const newIndex = i - 1;
+      const nodeId = tourPath[newIndex];
 
-    return newIndex;
-  });
+      setVisited(v => {
+        const arr = Array.from(v);
+        arr.pop();
+        return new Set(arr);
+      });
 
-  setOpenRight(true);
-};
+      setTimeout(() => goToNodeInTour(nodeId), 0);
+      return newIndex;
+    });
+    setOpenRight(true);
+  };
 
-
-
+  /* ---------------------------------------------------------
+      RENDER
+  --------------------------------------------------------- */
   return (
     <div className="wrapper">
-    <div
-     className='top-nav-buttons nav-buttons'
-    >
-      <button 
-        onClick={() => setCodeTourePopupOpen(true)}
-      >Code tour</button>
-      &nbsp;
-      &nbsp;
 
-      <button 
-        onClick={handleExpandAll}
-      >Expand All</button>
-      &nbsp;
-      &nbsp;
+      {/* Top Buttons */}
+      <div className="top-nav-buttons nav-buttons">
+        <button onClick={() => setCodeTourePopupOpen(true)}>Code tour</button>
+        &nbsp;&nbsp;
+        <button onClick={handleExpandAll}>Expand All</button>
+        &nbsp;&nbsp;
+        <button onClick={handleCollapseAll}>Collapse All</button>
+      </div>
 
-      <button 
-        onClick={handleCollapseAll}
-      >Collapse All</button>
-    </div>
+      {/* ReactFlow */}
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        // onNodeClick={handleNodeClick}
-        onEdgeClick={handleEdgeClick} 
+        onEdgeClick={handleEdgeClick}
         elementsSelectable={false}
         fitView
       >
         <Background color="#e0e0e0" gap={20} size={1} />
       </ReactFlow>
 
-      <div
-        className='bottom-nav-buttons nav-buttons'
-      >
+      {/* Bottom Navigation */}
+      <div className="bottom-nav-buttons nav-buttons">
         <NodeNav
           isActive={isTourActive}
           current={tourIndex + 1}
@@ -734,27 +688,23 @@ const prevTourStep = () => {
         />
       </div>
 
-    <PortalPopup
-      isOpen={isCodeTourePopupOpen}
-      onClose={() => setCodeTourePopupOpen(false)}
-      width="80%"
-      side="center"
-      title="Code Tour Overview"
-    >
-      <CodeTour
-        onStartTour={
-          () => {
+      {/* Tour Popup */}
+      <PortalPopup
+        isOpen={isCodeTourePopupOpen}
+        onClose={() => setCodeTourePopupOpen(false)}
+        width="80%"
+        side="center"
+        title="Code Tour Overview"
+      >
+        <CodeTour
+          onStartTour={() => {
             startTour();
             setCodeTourePopupOpen(false);
-          }
-        }
-      />  
-    </PortalPopup>
+          }}
+        />
+      </PortalPopup>
 
-    {
-      console.log("this is ",openRight)
-    }
-
+      {/* Right Side Node Popup */}
       <PortalPopup
         isOpen={openRight}
         onClose={() => setOpenRight(false)}
