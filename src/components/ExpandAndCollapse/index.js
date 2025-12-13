@@ -593,21 +593,32 @@ const ExpandAndCollapse = () => {
     // ---------- EDGES ----------
     setEdges(es =>
       es.map(e => {
-        const isCurrentEdge =
-          e.source === nodeId || e.target === nodeId;
+        const isTargetVisited = visitedSet.has(e.target);
+        const isSourceVisited = visitedSet.has(e.source);
 
-        const isVisitedEdge =
-          visitedSet.has(e.source) && visitedSet.has(e.target);
+        const isCurrentEdge =
+          e.source === nodeId && isTargetVisited;
 
         return {
           ...e,
           style: {
             ...e.style,
-            opacity: isCurrentEdge ? 1 : isVisitedEdge ? 1 : 0.2
+            opacity:
+              isCurrentEdge
+                ? 1
+                : isSourceVisited && isTargetVisited
+                  ? 1
+                  : 0.2
+          },
+          labelStyle: {
+            ...e.labelStyle,
+            opacity:
+              isSourceVisited && isTargetVisited ? 1 : 0.2
           }
         };
       })
     );
+
 
     // Remove glow after animation
     setTimeout(() => {
