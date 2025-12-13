@@ -753,6 +753,39 @@ const ExpandAndCollapse = () => {
   };
 
 
+  // reset the graph from tour
+
+  const resetGraphToNormal = useCallback(async () => {
+  // reset tour state
+  setIsTourActive(false);
+  setTourIndex(0);
+  setTourPath([]);
+  setVisited(new Set());
+  setSelectedNode(null);
+  setOpenRight(false);
+
+  // restore default visible structure
+  const normalNodes = defaultData.nodes.map(n => ({
+    ...n,
+    initialVisible: true
+  }));
+
+  const normalEdges = defaultData.edges;
+
+  const { nodes: layoutedNodes, edges: styledEdges } =
+    await getElkLayout(normalNodes, normalEdges, toggleExpand);
+
+  setNodes(layoutedNodes);
+  setEdges(styledEdges);
+
+  // refit view
+  setTimeout(() => {
+    rf.fitView({ padding: 0.3, duration: 500 });
+  }, 50);
+}, [rf, toggleExpand]);
+
+
+
   /* ---------------------------------------------------------
       RENDER
   --------------------------------------------------------- */
@@ -789,7 +822,7 @@ const ExpandAndCollapse = () => {
           total={tourPath.length}
           onNext={nextTourStep}
           onPrev={prevTourStep}
-          onClose={() => setIsTourActive(false)}
+          onClose={resetGraphToNormal}
           selectedNode={selectedNode}
         />
       </div>
