@@ -344,8 +344,8 @@ const edgeTypes = { smoothstep: SmoothStepEdge };
 const nodeTypes = { custom: CustomNode };
 
 const ExpandAndCollapse = () => {
-  const [nodes, setNodes] = useNodesState([]);
-  const [edges, setEdges] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [isCodeTourePopupOpen, setCodeTourePopupOpen] = useState(false);
 
@@ -805,6 +805,8 @@ const ExpandAndCollapse = () => {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onEdgeClick={handleEdgeClick}
