@@ -557,15 +557,19 @@ const ExpandAndCollapse = () => {
 
 
   async function goToNodeInTour(nodeId) {
+    // 🔒 Derive everything from tourPath + nodeId (NO visited state)
+    const currentIndex = tourPath.indexOf(nodeId);
+    const visitedSet = new Set(tourPath.slice(0, currentIndex + 1));
+
+    // Ensure required nodes are expanded
     await toggleExpand(nodeId);
     await new Promise(res => setTimeout(res, 30));
 
+    // ---------- NODES ----------
     setNodes(ns =>
       ns.map(n => {
         const isCurrent = n.id === nodeId;
-        const isVisited = visited.has(n.id) || isCurrent;
-        
-        const border = isCurrent ? (n.isAlwaysVisible ? "3px solid #5C6BC0" : "3px solid #FBBF24") : n.style.border
+        const isVisited = visitedSet.has(n.id);
 
         return {
           ...n,
@@ -576,17 +580,24 @@ const ExpandAndCollapse = () => {
           style: {
             ...n.style,
             opacity: isCurrent ? 1 : isVisited ? 1 : 0.2,
-            border: border
+            border: isCurrent
+              ? (n.isAlwaysVisible
+                  ? "3px solid #5C6BC0"
+                  : "3px solid #FBBF24")
+              : n.style.border
           }
         };
       })
     );
 
+    // ---------- EDGES ----------
     setEdges(es =>
       es.map(e => {
-        const isCurrentEdge = e.source === nodeId || e.target === nodeId;
+        const isCurrentEdge =
+          e.source === nodeId || e.target === nodeId;
+
         const isVisitedEdge =
-          visited.has(e.source) && visited.has(e.target);
+          visitedSet.has(e.source) && visitedSet.has(e.target);
 
         return {
           ...e,
@@ -598,6 +609,7 @@ const ExpandAndCollapse = () => {
       })
     );
 
+    // Remove glow after animation
     setTimeout(() => {
       setNodes(ns =>
         ns.map(n =>
@@ -608,6 +620,7 @@ const ExpandAndCollapse = () => {
       );
     }, 1000);
 
+    // Center view
     const node = rf.getNode(nodeId);
     if (node) {
       rf.setCenter(
@@ -636,35 +649,42 @@ const ExpandAndCollapse = () => {
     await goToNodeInTour(path[0]);
   };
 
+  function computeVisited(path, index) {
+    return new Set(path.slice(0, index + 1));
+  }
+
   const nextTourStep = () => {
     setTourIndex(i => {
       if (i + 1 >= tourPath.length) return i;
+
       const newIndex = i + 1;
       const nodeId = tourPath[newIndex];
-      setVisited(v => new Set([...v, nodeId]));
+
+      setVisited(computeVisited(tourPath, newIndex));
       setTimeout(() => goToNodeInTour(nodeId), 0);
+
       return newIndex;
     });
+
     setOpenRight(true);
   };
 
   const prevTourStep = () => {
     setTourIndex(i => {
       if (i - 1 < 0) return i;
+
       const newIndex = i - 1;
       const nodeId = tourPath[newIndex];
 
-      setVisited(v => {
-        const arr = Array.from(v);
-        arr.pop();
-        return new Set(arr);
-      });
-
+      setVisited(computeVisited(tourPath, newIndex));
       setTimeout(() => goToNodeInTour(nodeId), 0);
+
       return newIndex;
     });
+
     setOpenRight(true);
   };
+
 
   /* ---------------------------------------------------------
       RENDER
