@@ -591,30 +591,31 @@ const ExpandAndCollapse = () => {
     );
 
     // ---------- EDGES ----------
-    setEdges(es =>
-      es.map(e => {
-        const isTargetVisited = visitedSet.has(e.target);
-        const isSourceVisited = visitedSet.has(e.source);
+    setEdges(prevEdges =>
+      prevEdges.map(e => {
+        const sourceVisited = visitedSet.has(e.source);
+        const targetVisited = visitedSet.has(e.target);
 
-        const isCurrentEdge =
-          e.source === nodeId && isTargetVisited;
+        const isVisible = sourceVisited && targetVisited;
 
         return {
           ...e,
           style: {
             ...e.style,
-            opacity:
-              isCurrentEdge
-                ? 1
-                : isSourceVisited && isTargetVisited
-                  ? 1
-                  : 0.2
+            opacity: isVisible ? 1 : 0.2
           },
           labelStyle: {
             ...e.labelStyle,
-            opacity:
-              isSourceVisited && isTargetVisited ? 1 : 0.2
-          }
+            opacity: isVisible ? 1 : 0.2
+          },
+          labelBgStyle: {
+            // Make background match the edge visibility
+            fill: isVisible ? "#fff" : "#fff", // you can also use a dimmed color like "#f0f0f0"
+            opacity: isVisible ? 1 : 0.2
+          },
+          markerEnd: e.markerEnd
+            ? { ...e.markerEnd, color: isVisible ? "#46AE6F" : "#999" }
+            : undefined
         };
       })
     );
