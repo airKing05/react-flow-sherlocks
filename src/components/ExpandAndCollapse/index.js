@@ -143,6 +143,32 @@ function getAllEdges() {
   return out;
 }
 
+/* ----------------------------------------
+   STYLE EDGES — BASED ON LEVEL
+---------------------------------------- */
+
+// check the node level
+function computeNodeLevels(nodes) {
+  const levelMap = {};
+
+  function dfs(nodeId, level) {
+    levelMap[nodeId] = level;
+
+    nodes
+      .filter(n => n.parent === nodeId)
+      .forEach(child => dfs(child.id, level + 1));
+  }
+
+  // start from roots
+  nodes
+    .filter(n => n.parent === null)
+    .forEach(root => dfs(root.id, 0));
+
+  return levelMap;
+}
+
+
+
 /* ---------------------------------------------------------
       isExpanded helper
 --------------------------------------------------------- */
@@ -201,17 +227,43 @@ async function getElkLayout(nodes, edges, toggleExpand) {
   /* ----------------------------------------
      STYLE EDGES
   ---------------------------------------- */
+  /* ----------------------------------------
+   STYLE EDGES — BASED ON LEVEL
+---------------------------------------- */
+/* ----------------------------------------
+   STYLE EDGES — DEFAULT vs HIDDEN RULE
+---------------------------------------- */
+  const nodeLevels = computeNodeLevels(nodes);
+
   const styledEdges = edges.map(edge => {
+    const sourceNode = nodes.find(n => n.id === edge.source);
     const targetNode = nodes.find(n => n.id === edge.target);
-    const isVisibleTarget = targetNode?.initialVisible;
-    const color = isVisibleTarget ? "blue" : "#46AE6F";
+
+    const sourceLevel = nodeLevels[edge.source] ?? 0;
+
+    const sourceAlways = sourceNode?.isAlwaysVisible === true;
+    const targetAlways = targetNode?.isAlwaysVisible === true;
+
+    // ✅ Rule 1: level-based color ONLY for default nodes
+    const isDefaultConnection = sourceAlways && targetAlways;
+
+    const color = isDefaultConnection
+      ? sourceLevel === 0
+        ? "#3B82F6"     // root → level 1
+        : "#46AE6F"     // deeper default levels
+      : "#46AE6F";     // hidden children use green (can change if needed)
+
+    // ✅ Rule 2: hidden children = solid line
+    const strokeDasharray = isDefaultConnection
+      ? "6 4"          // keep dashed for default edges
+      : "0";           // SOLID for hiddable children
 
     return {
       ...edge,
       style: {
         stroke: color,
         strokeWidth: 3,
-        strokeDasharray: isVisibleTarget ? "6 4" : "0"
+        strokeDasharray
       },
       markerEnd: {
         type: MarkerType.ArrowClosed,
@@ -223,11 +275,12 @@ async function getElkLayout(nodes, edges, toggleExpand) {
       labelStyle: {
         fill: color,
         fontWeight: "bold",
-        fontSize: 12,
-        opacity: isVisibleTarget ? 1 : 0.5
-      },
+        fontSize: 12
+      }
     };
   });
+
+
 
   /* ----------------------------------------
      FIRST PASS — layout, style, NO isExpanded
