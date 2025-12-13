@@ -503,39 +503,58 @@ const ExpandAndCollapse = () => {
   /* ---------------------------------------------------------
       Code Tour (uses updated data)
   --------------------------------------------------------- */
-function buildTourPath(allNodes, rootId) {
-  // group nodes by parent
-  const childrenMap = {};
+  function buildTourPath(allNodes) {
+    // group nodes by parent
+    const childrenMap = {};
+    const nodeMap = {};
 
-  allNodes.forEach(n => {
-    if (!childrenMap[n.parent]) childrenMap[n.parent] = [];
-    childrenMap[n.parent].push(n.id);
-  });
-
-  // ensure stable ordering (optional)
-  Object.values(childrenMap).forEach(list => list.sort());
-
-  const path = [];
-
-  function dfs(nodeId) {
-    path.push(nodeId);                 // visit this node
-
-    const childList = childrenMap[nodeId] || [];
-
-    childList.forEach(childId => {
-      dfs(childId);                    // visit children before siblings
+    allNodes.forEach(n => {
+      nodeMap[n.id] = n;
+      if (!childrenMap[n.parent]) childrenMap[n.parent] = [];
+      childrenMap[n.parent].push(n.id);
     });
+
+    // stable ordering
+    Object.values(childrenMap).forEach(list => list.sort());
+
+    const path = [];
+
+    function dfs(nodeId) {
+      path.push(nodeId);
+
+      const children = childrenMap[nodeId] || [];
+
+      // 🔥 PRIORITY SORT
+      // 1️⃣ hidden children first
+      // 2️⃣ nodes with children before leaf nodes
+      // 3️⃣ alwaysVisible children last
+      const sorted = [...children].sort((a, b) => {
+        const A = nodeMap[a];
+        const B = nodeMap[b];
+
+        // hidden before always-visible
+        if (!!A.isAlwaysVisible !== !!B.isAlwaysVisible) {
+          return A.isAlwaysVisible ? 1 : -1;
+        }
+
+        // nodes with children first
+        if (!!A.hasChildren !== !!B.hasChildren) {
+          return A.hasChildren ? -1 : 1;
+        }
+
+        return 0;
+      });
+
+      sorted.forEach(childId => dfs(childId));
+    }
+
+    // roots (parent === null)
+    const roots = childrenMap[null] || [];
+    roots.forEach(r => dfs(r));
+
+    return path;
   }
 
-  // handle all top-level roots in order
-  const rootLevel = childrenMap[null] || [];
-
-  rootLevel.forEach(topNode => {
-    dfs(topNode);
-  });
-
-  return path;
-}
 
   async function goToNodeInTour(nodeId) {
     await toggleExpand(nodeId);
