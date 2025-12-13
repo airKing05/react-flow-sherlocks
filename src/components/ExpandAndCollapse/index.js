@@ -26,13 +26,15 @@ const elk = new ELK();
 --------------------------------------------------------- */
 const defaultData = {
   nodes: [
-    { id: "1", label: "a", parent: null, isAlwaysVisible: true, hasChildren: true },
+    { id: "0", label: "0", parent: null, isAlwaysVisible: true, hasChildren: false },
+    { id: "1", label: "a", parent: "0", isAlwaysVisible: true, hasChildren: true },
     { id: "30", label: "30", parent: "1", isAlwaysVisible: true, hasChildren: false },
     { id: "31", label: "31", parent: "1", isAlwaysVisible: true, hasChildren: true },
     { id: "311", label: "311", parent: "31", isAlwaysVisible: true, hasChildren: false },
     { id: "312", label: "312", parent: "31", isAlwaysVisible: true, hasChildren: false }
   ],
   edges: [
+    { id: "0-1", source: "0", target: "1", fixed: true },
     { id: "1-30", source: "1", target: "30", fixed: true },
     { id: "1-31", source: "1", target: "31", fixed: true },
     { id: "31-311", source: "31", target: "311", fixed: true },
