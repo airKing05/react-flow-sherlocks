@@ -90,7 +90,14 @@ return (
 
       {/* CARDS */}
       <div className="card-grid">
-        {cards.map((c, i) => (
+        {cards.map((c, i) => {
+          let rootNodeId = "0"
+            if (i % 2 === 0) {
+              rootNodeId = "0"
+            } else {
+              rootNodeId = "200"
+            }
+          return (
           <div key={i} className="card">
             <div className="card-content-wrapper">
               <h3 className="card-title">{c.title}</h3>
@@ -98,10 +105,10 @@ return (
             </div>
             <button 
               className="card-btn"
-              onClick={onStartTour}
+              onClick={() => onStartTour(rootNodeId)}
             >Learn More</button>
           </div>
-        ))}
+        )})}
       </div>
 
     </div>
