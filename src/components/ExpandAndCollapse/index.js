@@ -527,7 +527,8 @@ const ExpandAndCollapse = () => {
       const node = rf.getNode(nodeId);
       if (!node) return;
 
-      setSelectedNode(node);
+    // TODO: check if require then enable it
+      // setSelectedNode(node);
 
       rf.setCenter(
         node.position.x + (node.width || 200) / 2,
@@ -828,7 +829,8 @@ const nextTourStep = async () => {
         side="right"
         isOuterClickClose={true}
       >
-        <DemoContent content="" />
+     
+        <DemoContent content="" nodeId={selectedNode?.id} />
       </PortalPopup>
     </div>
   );

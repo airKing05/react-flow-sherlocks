@@ -4,10 +4,10 @@ import "./CustomNode.css"; // ← import CSS
 import PortalPopup from "../Portal/PortalPopup";
 import DemoContent from "../Portal/DemoContent";
 
-export default function CustomNode({ id, data }) {
+export default function CustomNode(props) {
+  const { id, data } = props;
   const { label } = data;
 
-  console.log("data", data)
   const [openRight, setOpenRight] = useState(false);
 
   const glow = data.isGlowing;
@@ -59,8 +59,9 @@ export default function CustomNode({ id, data }) {
         onClose={() => setOpenRight(false)}
         width="350px"
         side="right"
+        title={label}
       >
-         <DemoContent content="this is content" />
+         <DemoContent content="this is content" nodeId={id} />
       </PortalPopup>
     </>
   );

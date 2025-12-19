@@ -2,11 +2,19 @@
 // Later you can replace these with real fetch/axios calls
 
 import { defaultGraphData, childrenGraphData, nodeDetails } from "../data/graphData";
-import { fetchChildrenBasedOnParentId, getDefaultGraphsData } from "./apis";
+import { fetchAllChildren, fetchChildrenBasedOnParentId, fetchRootNodes, getDefaultGraphsData, getNodeDetails } from "./apis";
 
 // simulate network delay
 const delay = (ms = 200) =>
   new Promise(resolve => setTimeout(resolve, ms));
+
+/* ---------------- RootNodes of Graphs GRAPH API ---------------- */
+
+export async function getRootsOfGraph() {
+  const data = await fetchRootNodes();
+  // await delay();
+  return data;
+}
 
 /* ---------------- DEFAULT GRAPH API ---------------- */
 
@@ -19,23 +27,26 @@ export async function fetchDefaultGraph() {
 /* ---------------- CHILDREN GRAPH API ---------------- */
 
 export async function fetchChildrenGraph(nodeId) {
-  // const data = await fetchChildrenBasedOnParentId();
+  const data = await fetchChildrenBasedOnParentId(nodeId);
   // await delay();
-  return childrenGraphData[nodeId] || { nodes: [], edges: [] };
-  // return data;
+  // return childrenGraphData[nodeId] || { nodes: [], edges: [] };
+  return data;
 }
 
 /* ---------------- OPTIONAL HELPERS ---------------- */
 
 export async function fetchAllChildrenGraphs() {
-  await delay();
-  return childrenGraphData;
+  const data = await fetchAllChildren();
+  // await delay();
+  // return childrenGraphData;
+  return data;
 }
 
 
 /* ---------------- NODE CLICK DETAILS API ---------------- */
 
 export async function fetchNodeDetails(nodeId) {
-  await delay();
-  return nodeDetails;
+  const data = await getNodeDetails(nodeId);
+  // await delay();
+  return data;
 }

@@ -1,81 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./CodeTour.css";
+import { getRootsOfGraph } from "../../apis/graphApi";
 
-const CodeTour = ({onStartTour}) => {
+const CodeTour = ({ onStartTour }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [rootNodes, setRootNodes] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const detailsParagraph = `
-    Technology continues to evolve at an incredible pace, reshaping how we communicate,
-    work, and experience the world. Innovations in artificial intelligence,
-    biotechnology, and digital infrastructure are influencing nearly every industry.
-    From automation improving workplace efficiency to machine learning driving smarter
-    decision-making, the impact is both widespread and profound. As organizations
-    adapt to these shifts, embracing digital transformation has become more essential
-    than ever. The future holds exciting opportunities for those who are ready to
-    leverage these advancements and integrate them into everyday solutions.
-     Technology continues to evolve at an incredible pace, reshaping how we communicate,
-    work, and experience the world. Innovations in artificial intelligence,
-    biotechnology, and digital infrastructure are influencing nearly every industry.
-    From automation improving workplace efficiency to machine learning driving smarter
-    decision-making, the impact is both widespread and profound. As organizations
-    adapt to these shifts, embracing digital transformation has become more essential
-    than ever. The future holds exciting opportunities for those who are ready to
-    leverage these advancements and integrate them into everyday solutions.
-     Technology continues to evolve at an incredible pace, reshaping how we communicate,
-    work, and experience the world. Innovations in artificial intelligence,
-    biotechnology, and digital infrastructure are influencing nearly every industry.
-    From automation improving workplace efficiency to machine learning driving smarter
-    decision-making, the impact is both widespread and profound. As organizations
-    adapt to these shifts, embracing digital transformation has become more essential
-    than ever. The future holds exciting opportunities for those who are ready to
-    leverage these advancements and integrate them into everyday solutions.
-  `;
-
-  const cards = [
-    {
-      title: "Innovation & Strategy",
-      content: `In today’s fast-changing environment, organizations need forward-thinking
-      strategies that help them stay competitive. Innovation is no longer a luxury—it
-      is a core requirement. Businesses that embrace experimentation, data-driven
-      planning, and continuous improvement are better positioned to adapt to new
-      challenges and unlock long-term success.`
-    },
-    {
-      title: "Digital Transformation",
-      content: `Digital tools are redefining how companies deliver value. Whether it’s
-      automation, cloud infrastructure, or AI-driven systems, technology now powers the
-      backbone of modern operations. A strong transformation roadmap can streamline
-      workflows, improve customer experiences, and open the door to scalable growth.`
-    },
-    {
-      title: "Human-Centered Design",
-      content: `Design thinking prioritizes user needs and real-world experiences. By
-      understanding pain points, motivations, and behavior patterns, organizations can
-      build products that resonate deeply with their audiences. Human-centered design
-      helps convert complex problems into intuitive, meaningful solutions.`
-    },
-    {
-      title: "Human-Centered Design - 1",
-      content: `Design thinking prioritizes user needs and real-world experiences. By
-      understanding pain points, motivations, and behavior patterns, organizations can
-      build products that resonate deeply with their audiences. Human-centered design
-      helps convert complex problems into intuitive, meaningful solutions.`
+  const getRootNodesDetails =  async () => {
+    try {
+      const data = await getRootsOfGraph();
+        setRootNodes(data);
+        setLoading(false);
+    } catch (error) {
+        console.error("Failed to fetch root nodes", error);
+        setLoading(false);
     }
-  ];
+  }
+  
+  useEffect(() => {
+    getRootNodesDetails();
+  }, []);
 
-return (
+  if (loading) {
+    return <div className="section-container">Loading...</div>;
+  }
+
+  if (!rootNodes.length) {
+    return <div className="section-container">No data available</div>;
+  }
+
+  const activeRoot = rootNodes[activeIndex];
+
+  return (
     <div className="section-container">
 
       {/* DETAILS */}
       <div className="details-section">
         <p className={`details-text ${showDetails ? "expanded" : ""}`}>
-          {detailsParagraph}
+          {activeRoot.description}
         </p>
 
         <div className="details-btn-wrapper">
           <span
             className="details-link"
-            onClick={() => setShowDetails(!showDetails)}
+            onClick={() => setShowDetails(prev => !prev)}
           >
             {showDetails ? "Hide" : "Show More"}
           </span>
@@ -85,30 +55,34 @@ return (
       {/* TITLE */}
       <div className="title-area">
         <h2 className="main-title">Our Focus Areas</h2>
-        <p className="subtitle">Driving innovation through thoughtful design and technology</p>
+        <p className="subtitle">
+          Driving innovation through thoughtful design and technology
+        </p>
       </div>
 
-      {/* CARDS */}
+      {/* CARDS (one card per root node) */}
       <div className="card-grid">
-        {cards.map((c, i) => {
-          let rootNodeId = "0"
-            if (i % 2 === 0) {
-              rootNodeId = "0"
-            } else {
-              rootNodeId = "200"
-            }
-          return (
-          <div key={i} className="card">
+        {rootNodes.map((root, index) => (
+          <div key={root.id} className="card">
             <div className="card-content-wrapper">
-              <h3 className="card-title">{c.title}</h3>
-              <p className="card-content">{c.content}</p>
+              <h3 className="card-title">{root.title}</h3>
+              <p className="card-content">
+              {/* {root.description} */}
+                {root.description.slice(0, 160)}...
+              </p>
             </div>
-            <button 
+
+            <button
               className="card-btn"
-              onClick={() => onStartTour(rootNodeId)}
-            >Learn More</button>
+              onClick={() => {
+                setActiveIndex(index);
+                onStartTour(root.node.id);
+              }}
+            >
+              Start Tour
+            </button>
           </div>
-        )})}
+        ))}
       </div>
 
     </div>

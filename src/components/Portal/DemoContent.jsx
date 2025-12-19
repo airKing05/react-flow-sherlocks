@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import "./DemoContent.css";
 import { fetchNodeDetails } from "../../apis/graphApi";
 
-const DemoContent = ({content}) => {
+const DemoContent = ({content, nodeId}) => {
   const [data, setData] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(true);
 
 
-  const getNodeDetails = async() => {
+  const getNodeDetails = async(nodeId) => {
      try {
-      const data = await fetchNodeDetails("1");
+      const data = await fetchNodeDetails(nodeId);
         setData(data);
         setLoading(false);
      } catch (error) {
@@ -18,8 +18,9 @@ const DemoContent = ({content}) => {
      }
   }
   useEffect(() => {
-   getNodeDetails()
-  }, []);
+    if(!nodeId) return;
+    getNodeDetails(nodeId)
+  }, [nodeId]);
 
   if (loading) {
     return <div className="demo-wrapper">Loading...</div>;
