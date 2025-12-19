@@ -102,3 +102,46 @@ export const childrenGraphData = {
   "311": { nodes: [], edges: [] },
   "312": { nodes: [], edges: [] }
 };
+
+
+export const nodeDetails = {
+  "meta": {
+    "type": "Function",
+    "file": "css-prune.js"
+  },
+  "details": {
+    "infoMessage": "This is a detailed informational message with additional context.",
+    "description": "Here you can place deeper descriptions, instructions or additional info for the user."
+  },
+  "explanation": "Type: Function\nFile: css-prune.js\nPurpose: Locates the nearest ancestor AST node that represents either a standard HTML element (RegularElement) or a Svelte component (SvelteElement).\nTraversal: Iterates backward through node.metadata.path.\nCondition: Checks the type property of each ancestor.\nReturn Value: Returns the first matching element ancestor found, or null.\nEfficiency: Uses a while (i--) loop.",
+  "chips": [
+    { "label": "Dashboard", "icon": "&#10148;" },
+    { "label": "Settings", "icon": "&#10148;" },
+    { "label": "Analytics", "icon": "&#10148;" },
+    { "label": "Profile", "icon": "&#10148;" },
+    { "label": "Reports", "icon": "&#10148;" }
+  ],
+  "alerts": [
+    {
+      "variant": "warning",
+      "icon": "⚠️",
+      "title": "Warning",
+      "text": "Something might require your immediate attention.",
+      "actions": ["Review", "Check Logs"]
+    },
+    {
+      "variant": "error",
+      "icon": "❌",
+      "title": "Error",
+      "text": "A critical process has failed. Try again.",
+      "actions": ["Retry", "Contact Support"]
+    },
+    {
+      "variant": "success",
+      "icon": "✅",
+      "title": "Success",
+      "text": "Operation completed successfully!",
+      "actions": ["View", "Continue"]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 // This file simulates backend APIs
 // Later you can replace these with real fetch/axios calls
 
-import { defaultGraphData, childrenGraphData } from "../data/graphData";
+import { defaultGraphData, childrenGraphData, nodeDetails } from "../data/graphData";
 import { fetchChildrenBasedOnParentId, getDefaultGraphsData } from "./apis";
 
 // simulate network delay
@@ -30,4 +30,12 @@ export async function fetchChildrenGraph(nodeId) {
 export async function fetchAllChildrenGraphs() {
   await delay();
   return childrenGraphData;
+}
+
+
+/* ---------------- NODE CLICK DETAILS API ---------------- */
+
+export async function fetchNodeDetails(nodeId) {
+  await delay();
+  return nodeDetails;
 }
